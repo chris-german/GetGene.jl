@@ -16,7 +16,7 @@
 Using:
 
 ```julia
-    > getgene(rsids)
+    > getgenes(rsids)
 ```
 
 will return associated loci names.
