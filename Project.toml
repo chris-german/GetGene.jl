@@ -1,0 +1,4 @@
+name = "GetGene"
+uuid = "fa12694a-6dff-11e9-3f23-c5fa6b69506f"
+authors = ["Chris German <germc3@ucla.edu>"]
+version = "0.1.0"
