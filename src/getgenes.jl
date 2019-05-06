@@ -23,6 +23,7 @@ function genecheck(info)
     return locus
 end
 
+#checks to make sure the HTTP has valid information
 function httpcheck(snpid)   
     http = HTTP.Messages.Response()
     try
@@ -33,6 +34,29 @@ function httpcheck(snpid)
     return http
 end
 
+
+"""
+    getgenes(data::DataFrame; idvar::AbstractString)
+
+# Position arguments
+
+- `data::DataFrame`: A DataFrame containing a column with the Ref SNP IDs. By default, assumes that the variable name is "snpid". The variable name can be specified using the `idvar` keyword.
+
+# Keyword arguments
+
+- `idvar::AbstractString`: the variable name in the dataframe that specifies the Ref SNP ID (rsid).
+
+    getgenes(snps::AbstractArray)
+
+# Position arguments
+
+- `snps::AbstractArray`: Ref SNP IDs (rsid) to get loci names for. 
+
+# Output
+
+Returns an array of gene loci associated to the Ref SNP IDs.
+
+"""
 function getgenes(snpids)
     snpids = getSNPID.(snpids)
     loci = Vector{String}(undef, 0)
@@ -48,4 +72,13 @@ function getgenes(snpids)
         push!(loci, locus)
     end
     return loci
+end
+
+function getgenes(df::DataFrame; idvar::AbstractString = "snpid")
+    rsidsym = Meta.parse(idvar)
+    if !(rsidsym in names(df))
+        throw(ArgumentError(idvar * " is not in the dataframe. Please rename 
+        the column of rsids to `snpid` or specify the correct name using the `idvar` argument"))
+    end
+    getgenes(df[rsidsym])
 end
