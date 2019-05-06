@@ -46,6 +46,7 @@ end
 
 - `idvar::AbstractString`: the variable name in the dataframe that specifies the Ref SNP ID (rsid).
 
+
     getgenes(snps::AbstractArray)
 
 # Position arguments

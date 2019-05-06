@@ -2,7 +2,7 @@ __precompile__()
 
 module GetGene
 
-using HTTP, LazyJSON
+using HTTP, LazyJSON, DataFrames
 
 export
     getgenes
