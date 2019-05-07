@@ -5,7 +5,9 @@ module GetGene
 using HTTP, LazyJSON, DataFrames
 
 export
-    getgenes
+    getgenes,
+    getgeneinfo
+
 include("getgenes.jl")
 
 end

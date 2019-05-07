@@ -83,3 +83,58 @@ function getgenes(df::DataFrame; idvar::AbstractString = "snpid")
     end
     getgenes(df[rsidsym])
 end
+
+
+#gets additional gene information
+function getinfo(info)
+    snp_id = info["refsnp_id"]
+    annotations = info["primary_snapshot_data"]["allele_annotations"]
+    geneinfo = Dict()
+    for a in annotations
+        assembly_annotations = a["assembly_annotation"]
+        for aa in assembly_annotations
+            seq_id = aa["seq_id"]
+            annotation_release = aa["annotation_release"]
+            genes = aa["genes"]
+                for g in genes
+                    gene_name = g["name"]
+                    gene_id = string(g["id"])
+                    gene_locus = g["locus"]
+                    gene_is_pseudo = string(Int(g["is_pseudo"] == "true"))
+                    gene_orientation = string(Int(g["orientation"] == "minus"))
+                    geneinfo = Dict("seq_id" => seq_id, "annotation_release" => annotation_release,
+                    "gene_name" => gene_name, "gene_id" => gene_id, "gene_locus" => gene_locus,
+                    "gene_is_pseudo" => gene_is_pseudo, "gene_orientation" => gene_orientation)
+                end
+        end 
+    end
+    return geneinfo
+end
+
+"""
+    getgeneinfo(snpid::AbstractString)
+
+# Position arguments
+
+- `snp::AbstractString`: Ref SNP ID (rsid) to get gene information for. 
+
+# Output
+
+Returns a dictionary of gene information associated with the Ref SNP ID. Entries are `seq_id`, `annotation_release`, `gene_name`, `gene_id`, `gene_locus`, `gene_is_pseudo`, and `gene_orientation`.
+
+"""
+function getgeneinfo(snpid::AbstractString)
+    geneinfo = Dict()
+    rsid = getSNPID(snpid);
+    http = httpcheck(rsid);
+    if isempty(http.body)
+        throw(ArgumentError("Ref SNP ID (rsid) not in database"))
+    end 
+    str = String(http.body)
+    info = LazyJSON.parse(str)
+    geneinfo = getinfo(info)
+    if isempty(geneinfo)
+        geneinfo = Dict("Empty" => "No gene info listed for ref SNP ID")
+    end
+    return geneinfo
+end
