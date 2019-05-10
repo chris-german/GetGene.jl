@@ -14,6 +14,6 @@ makedocs(
 )
 
 deploydocs(
-    repo   = "github.com/OpenMendel/GetGene.jl.git",
+    repo   = "github.com/chris-german/GetGene.jl.git",
     target = "build"
 )
