@@ -3,9 +3,14 @@ using Documenter, GetGene
 ENV["DOCUMENTER_DEBUG"] = "true"
 
 makedocs(
-    format = :html,
+    format = Documenter.HTML(),
     sitename = "GetGene",
-    modules = [GetGene]
+    authors = "Chris German",
+    clean = true,
+    debug = true,
+    pages = [
+        "index.md"
+    ]
 )
 
 deploydocs(
