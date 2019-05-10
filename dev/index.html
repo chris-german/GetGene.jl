@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>GetGene.jl · GetGene</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>GetGene</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li class="current"><a class="toctext" href>GetGene.jl</a><ul class="internal"><li class="toplevel"><a class="toctext" href="#Installation-1">Installation</a></li><li><a class="toctext" href="#Basic-usage-1">Basic usage</a></li><li><a class="toctext" href="#getgenes()-1">getgenes()</a></li><li><a class="toctext" href="#getgeneinfo()-1">getgeneinfo()</a></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li><a href>GetGene.jl</a></li></ul><a class="edit-page" href="https://github.com/chris-german/GetGene.jl/blob/master/docs/src/index.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>GetGene.jl</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="GetGene.jl-1" href="#GetGene.jl-1">GetGene.jl</a></h1><p>GetGene.jl is a Julia package that queries the NIH NCBI&#39;s dbSNP API to retrieve gene information based on an input RefSNP ID (rsid). The package can currently get loci names for an array of rsids and retrieve other gene information for a single inputted rsid.</p><h1><a class="nav-anchor" id="Installation-1" href="#Installation-1">Installation</a></h1><p>This package requires Julia v0.7.0 or later. Start julia and use the <code>]</code> key to switch to the package manager REPL and proceed as follows:</p><pre><code class="language-julia">(v1.0) pkg&gt; add GetGene</code></pre><pre><code class="language-julia"># machine information for this tutorial
+versioninfo()</code></pre><pre><code class="language-none">Julia Version 1.1.0
+Commit 80516ca202 (2019-01-21 21:24 UTC)
+Platform Info:
+  OS: macOS (x86_64-apple-darwin14.5.0)
+  CPU: Intel(R) Core(TM) i7-4850HQ CPU @ 2.30GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-6.0.1 (ORCJIT, haswell)</code></pre><p>In the tutorial we will use the following packages:</p><pre><code class="language-julia">using DataFrames, GetGene</code></pre><h2><a class="nav-anchor" id="Basic-usage-1" href="#Basic-usage-1">Basic usage</a></h2><p>The following commands can be used to create the test dataset. We will use the following rsids. </p><pre><code class="language-julia">rsids = [&quot;rs113980419&quot;, &quot;rs17367504&quot;, 
+&quot;rs13107325&quot;, &quot;rs2392929&quot;, &quot;rs11824864&quot;,
+&quot;78067132&quot;, &quot;rs4909945&quot;, &quot;Affx-4150211&quot;,
+&quot;rs2270993&quot;]
+df = DataFrame(rsids = rsids)
+9×1 DataFrame
+│ Row │ rsids        │
+│     │ String       │
+├─────┼──────────────┤
+│ 1   │ rs113980419  │
+│ 2   │ rs17367504   │
+│ 3   │ rs13107325   │
+│ 4   │ rs2392929    │
+│ 5   │ rs11824864   │
+│ 6   │ 78067132     │
+│ 7   │ rs4909945    │
+│ 8   │ Affx-4150211 │
+│ 9   │ rs2270993    │</code></pre><p>The basic commands for MendelPlots.jl are   </p><pre><code class="language-julia">getgenes()
+getgeneinfo()</code></pre><h2><a class="nav-anchor" id="getgenes()-1" href="#getgenes()-1">getgenes()</a></h2><p><code>getgenes()</code> gets the gene loci information from NCBI&#39;s dbSNP API. </p><h3><a class="nav-anchor" id="Inputs-1" href="#Inputs-1">Inputs</a></h3><p><code>getgenes()</code> takes either an array of RefSNP IDs or a dataframe where one column has the rsids. The variable name by default is assumed to be named <code>snpid</code>. The variable name can be specified using the <code>idvar</code> keyword argument. </p><h3><a class="nav-anchor" id="Output-1" href="#Output-1">Output</a></h3><p><code>getgenes()</code> outputs an array with the corresponding gene loci names of the inputted rsids. If the rsid is not in dbSNP, it will say the rsid was not in the database for that entry. If there was no gene associated with the rsid, it will say there is no gene listed for that entry.</p><p>For documentation of the <code>getgenes</code> function, type <code>?getgenes</code> in Julia REPL.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="GetGene.getgenes" href="#GetGene.getgenes"><code>GetGene.getgenes</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-julia">getgenes(data::DataFrame; idvar::AbstractString)</code></pre><p><strong>Position arguments</strong></p><ul><li><code>data::DataFrame</code>: A DataFrame containing a column with the Ref SNP IDs. By default, assumes that the variable name is &quot;snpid&quot;. The variable name can be specified using the <code>idvar</code> keyword.</li></ul><p><strong>Keyword arguments</strong></p><ul><li><code>idvar::AbstractString</code>: the variable name in the dataframe that specifies the Ref SNP ID (rsid).</li></ul><pre><code class="language-none">getgenes(snps::AbstractArray)</code></pre><p><strong>Position arguments</strong></p><ul><li><code>snps::AbstractArray</code>: Ref SNP IDs (rsid) to get loci names for. </li></ul><p><strong>Output</strong></p><p>Returns an array of gene loci associated to the Ref SNP IDs.</p></div></div><a class="source-link" target="_blank" href="https://github.com/chris-german/GetGene.jl/blob/56c53fe277642631af8ecf5f1a84576eee699074/src/getgenes.jl#L38-L60">source</a></section><pre><code class="language-julia">getgenes(rsids)</code></pre><pre><code class="language-none">9-element Array{String,1}:
+ &quot;C1orf167&quot;             
+ &quot;MTHFR&quot;                
+ &quot;SLC39A8&quot;              
+ &quot;No gene listed&quot;       
+ &quot;SPI1&quot;                 
+ &quot;No gene listed&quot;       
+ &quot;MRVI1&quot;                
+ &quot;snpid not in database&quot;
+ &quot;PTPRJ&quot;</code></pre><p>the rsid should start with the prefix <code>rs</code>, but if you omit the <code>rs</code> it will also work.</p><pre><code class="language-julia">getgenes(&quot;13107325&quot;)</code></pre><pre><code class="language-none">&quot;SLC39A8&quot;</code></pre><h2><a class="nav-anchor" id="getgeneinfo()-1" href="#getgeneinfo()-1">getgeneinfo()</a></h2><p><code>getgeneinfo()</code> gets the gene information of the inputted rsid from NCBI&#39;s dbSNP API. </p><h3><a class="nav-anchor" id="Inputs-2" href="#Inputs-2">Inputs</a></h3><p><code>getgenes()</code> takes either an array of RefSNP IDs or a dataframe where one column has the rsids. The variable name by default is assumed to be named <code>snpid</code>. The variable name can be specified using the <code>idvar</code> keyword argument. </p><h3><a class="nav-anchor" id="Output-2" href="#Output-2">Output</a></h3><p><code>getgenes()</code> outputs a dictionary of the corresponding rsids. If the rsid is not in dbSNP, it will return an error. If there was no gene associated with the rsid, it will say there is no gene information listed for that entry. It returns a dictionary of gene information associated with the Ref SNP ID. The dictionary keys are <code>seq_id</code>, <code>annotation_release</code>, <code>gene_name</code>, <code>gene_id</code>, <code>gene_locus</code>, <code>gene_is_pseudo</code>, and <code>gene_orientation</code>.</p><pre><code class="language-julia">getgeneinfo(&quot;rs13107325&quot;)</code></pre><pre><code class="language-none">Dict{String,AbstractString} with 7 entries:
+  &quot;annotation_release&quot; =&gt; &quot;Homo sapiens Annotation Release 109&quot;
+  &quot;gene_name&quot;          =&gt; &quot;solute carrier family 39 member 8&quot;
+  &quot;gene_locus&quot;         =&gt; &quot;SLC39A8&quot;
+  &quot;gene_id&quot;            =&gt; &quot;64116&quot;
+  &quot;seq_id&quot;             =&gt; &quot;NC_000004.12&quot;
+  &quot;gene_is_pseudo&quot;     =&gt; &quot;0&quot;
+  &quot;gene_orientation&quot;   =&gt; &quot;1&quot;</code></pre><footer><hr/></footer></article></body></html>
