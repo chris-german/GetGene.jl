@@ -2,7 +2,7 @@
 #API found here: https://api.ncbi.nlm.nih.gov/variation/v0/
 
 #takes "rs" out of snpids/rsids if they start with "rs###"
-function getSNPID(snpid)
+function getSNPID(snpid::String)
     id = ""
     try
         id = match(r"(?<=rs)\w+", snpid).match
@@ -13,7 +13,7 @@ function getSNPID(snpid)
 end
 
 #checks if gene information is present, if not, return no gene found
-function genecheck(info)
+function genecheck(info::LazyJSON.Object{Nothing,String})
     locus = ""
     try 
         locus = info["primary_snapshot_data"]["allele_annotations"][1]["assembly_annotation"][1]["genes"][1]["locus"]
@@ -24,7 +24,7 @@ function genecheck(info)
 end
 
 #checks to make sure the HTTP has valid information
-function httpcheck(snpid)   
+function httpcheck(snpid::AbstractString)   
     http = HTTP.Messages.Response()
     try
         http = HTTP.get("https://api.ncbi.nlm.nih.gov/variation/v0/beta/refsnp/" * snpid)
@@ -58,7 +58,7 @@ end
 Returns an array of gene loci associated to the Ref SNP IDs.
 
 """
-function getgenes(snpids)
+function getgenes(snpids::AbstractArray)
     snpids = getSNPID.(snpids)
     loci = Vector{String}(undef, 0)
     for snpid in snpids
@@ -82,6 +82,23 @@ function getgenes(df::DataFrame; idvar::AbstractString = "snpid")
         the column of rsids to `snpid` or specify the correct name using the `idvar` argument"))
     end
     getgenes(df[rsidsym])
+end
+
+function getgenes(snpid::Union{String, Int64})
+    if typeof(snpid) == Int64
+        snpid = string(snpid)
+    end
+    snpid = getSNPID(snpid)
+    locus = ""
+    http = httpcheck(snpid)
+    if isempty(http.body)
+        locus = "snpid not in database"
+    else 
+        str = String(http.body)
+        info = LazyJSON.parse(str)
+        locus = genecheck(info)
+    end
+    return locus
 end
 
 

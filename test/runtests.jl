@@ -23,6 +23,7 @@ df = DataFrame(rsid = snps)
 @testset "snpid match" begin
     @test getgenes(snps) == loci
     @test getgenes(df; idvar = "rsid") == loci
+    @test getgenes(2270993) == "PTPRJ"
 end
 
 @testset "Argument Error" begin
